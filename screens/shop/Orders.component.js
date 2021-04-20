@@ -1,18 +1,147 @@
-import React from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { View } from "react-native";
-import { Text, Appbar, Title } from "react-native-paper";
+import {
+    Text,
+    Appbar,
+    Title,
+    List,
+    ActivityIndicator,
+} from "react-native-paper";
 import { createStackNavigator } from "@react-navigation/stack";
-import { NavBarConfig } from "../../navigation/ShopNavigator";
+import Colors from "../../Constants/Colors";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { useDispatch, useSelector } from "react-redux";
+import { getOrders } from "../../store/actions/user";
+import { Message } from "./Home.component";
+
+// import { NavBarConfig } from "../../navigation/ShopNavigator";
 
 const { Navigator, Screen } = createStackNavigator();
-export const OrdersScreen = (props) => {
+
+/**
+ * 
+ * @param {String} isoDateString - new Date().toISOString()
+ * @returns {[String]}
+ */
+const processedDate = (isoDateString) => {
+    let [date, time] = isoDateString.split("T");
+    time = time.substr(0, 8);
+
+    return [date, time];
+};   
+
+const ListAccordion = (props) => {
+
+    const [date, time] = processedDate(props.date);
     return (
-        <View
-            style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
+        <List.Accordion
+            title={`Order No: ${props.id}`}
+            id={1}
+            style={{
+                elevation: 1,
+                backgroundColor: "white",
+                marginBottom: 5,
+            }}
         >
-            <Title>You have no orders</Title>
+            {props.items.map((item) => (
+                <List.Item
+                    title={item.productTitle}
+                    description={`Qty: ${item.quantity} Amt: \$${item.sum}
+                    `}
+                    key={item.id}
+                />
+            ))}
+            <List.Item
+                title={`Total: \$${props.amount}`}
+                description={`Transaction done on ${date} at ${time}`}
+            />
+        </List.Accordion>
+    );
+};
+
+export const OrdersScreen = ({ navigation }) => {
+    const { orders } = useSelector((state) => state.user);
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState(false);
+    const dispatch = useDispatch();
+    // const [isRefreshing, setIsRefreshing] = useState(false);
+
+    //fetch orders
+    const fetchOrders = useCallback(async () => {
+        try {
+            setError(false);
+            setIsLoading(true);
+            await dispatch(getOrders());
+        } catch (err) {
+            setError({
+                message: "Something went wrong",
+            });
+        } finally {
+            setIsLoading(false);
+        }
+    }, [dispatch, setError]);
+
+    // fetcgh orders on mount
+
+    useEffect(() => {
+        fetchOrders();
+    }, []);
+    useEffect(() => {
+        const sub = navigation.addListener("focus", fetchOrders);
+
+        return sub;
+    }, [fetchOrders]);
+
+    if (isLoading) {
+        return (
+            <Message>
+                <ActivityIndicator color={Colors.indigo} size="large" />
+            </Message>
+        );
+    }
+
+    if (!isLoading && orders.length <= 0) {
+        return (
+            <Message>
+                <Title>You have no orders</Title>
+            </Message>
+        );
+    }
+
+    return (
+        <View style={{ flex: 1, marginTop: 1 }}>
+            <List.AccordionGroup>
+                {orders.map((order) => (
+                    <ListAccordion
+                        id={order.id}
+                        items={order.items}
+                        amount={order.amount}
+                        date={order.created_at}
+                        key={order.id}
+                    />
+                ))}
+            </List.AccordionGroup>
         </View>
     );
+};
+const NavBarConfig = {
+    // header: (props) => <CustomNavBar {...props} />,
+    headerTitleAlign: "center",
+    headerTintColor: Colors.black,
+    headerTitleStyle: {
+        fontSize: 18,
+        fontWeight: "200",
+        color: Colors.black,
+        // fontWeight: "700",
+    },
+    headerTitle: (props) => <Text {...props}>{props.children}</Text>,
+    headerBackImage: (props) => (
+        <MaterialCommunityIcons
+            name="chevron-left"
+            size={30}
+            color={props.tintColor}
+        />
+    ),
 };
 
 export const Orders = () => {

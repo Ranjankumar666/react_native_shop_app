@@ -3,15 +3,16 @@ import React, { useState } from "react";
 import { View, StyleSheet, Image, ScrollView } from "react-native";
 import {
     Button,
-    List,
+
     Title,
-    Text,
+
     Subheading,
     Paragraph,
 } from "react-native-paper";
 import { useDispatch, useSelector } from "react-redux";
 import Colors from "../../Constants/Colors";
-import { addToCart, removeFromCart } from "../../store/actions/user";
+import { addToCart, orderCart, removeFromCart } from "../../store/actions/user";
+import CartItem from "../../models/cartItem";
 
 export const Detail = ({ route, navigation }) => {
     const { availableProducts } = useSelector((state) => state.products);
@@ -20,8 +21,10 @@ export const Detail = ({ route, navigation }) => {
     const product = availableProducts.filter(
         (item) => item.id === route.params.id
     )[0];
+    const [order, setOrder] = useState(false);
 
-    const isPresentInCart = () => cart.find((item) => item === route.params.id);
+    const isPresentInCart = () =>
+        cart.find((item) => item.id === route.params.id);
 
     return (
         <ScrollView>
@@ -33,8 +36,17 @@ export const Detail = ({ route, navigation }) => {
                     />
                 </View>
                 <View style={styles.heading}>
-                    <Subheading>{product.title}</Subheading>
-                    <Title style={{ fontSize: 25, color: Colors.black }}>
+                    <Subheading style={{ width: "70%" }}>
+                        {product.title}
+                    </Subheading>
+                    <Title
+                        style={{
+                            fontSize: 25,
+                            color: Colors.black,
+                            width: "30%",
+                            textAlign: "right",
+                        }}
+                    >
                         ${product.price}
                     </Title>
                 </View>
@@ -59,7 +71,7 @@ export const Detail = ({ route, navigation }) => {
                                 dispatch(removeFromCart(route.params.id));
                                 return;
                             }
-                            dispatch(addToCart(route.params.id));
+                            dispatch(addToCart(product));
                         }}
                     >
                         {isPresentInCart() ? "Remove Item" : "Add To Cart"}
@@ -67,7 +79,20 @@ export const Detail = ({ route, navigation }) => {
                     <Button
                         icon="package-variant"
                         mode="contained"
+                        loading={order}
                         style={{ backgroundColor: Colors.indigo }}
+                        onPress={async () => {
+                            setOrder(true)
+                            const item = new CartItem(
+                                product.id,
+                                1,
+                                product.price,
+                                product.title
+                            );
+                            await dispatch(orderCart([item]));
+                            setOrder(false)
+                            navigation.navigate("Orders")
+                        }}
                     >
                         Order Now
                     </Button>

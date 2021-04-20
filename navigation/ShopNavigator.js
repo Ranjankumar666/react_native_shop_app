@@ -3,41 +3,41 @@ import { createStackNavigator } from "@react-navigation/stack";
 import { Home } from "../screens/shop/Home.component";
 import { Cart } from "../screens/shop/Cart.component";
 import { Detail } from "../screens/shop/Detail.component";
-import { CustomNavBar } from "../components/CustomNavBar.component";
-import { Text, Appbar } from "react-native-paper";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { Appbar, Badge } from "react-native-paper";
 import Colors from "../Constants/Colors";
-import { Orders } from "../screens/shop/Orders.component";
+import { NavConfig as NavBarConfig } from "../Constants/NavConfig";
+import { AutoLogin } from "../screens/shop/AutoLogin.component";
+import { useSelector } from "react-redux";
+import { StyleSheet } from "react-native";
 
 const { Navigator, Screen } = createStackNavigator();
 
-export const NavBarConfig = {
-    // header: (props) => <CustomNavBar {...props} />,
-    headerTitleAlign: "center",
-    headerTintColor: Colors.black,
-    headerTitleStyle: {
-        fontSize: 18,
-        fontWeight: "200",
-        color: Colors.black,
-        // fontWeight: "700",
-    },
-    headerTitle: (props) => <Text {...props}>{props.children}</Text>,
-    headerBackImage: (props) => (
-        <MaterialCommunityIcons
-            name="chevron-left"
-            size={30}
-            color={props.tintColor}
-        />
-    ),
-};
+const styles = StyleSheet.create({
+    cartIcon: {position: "relative"},
+    badge: {
+        position: "absolute",
+        top: 10,
+        right: 6,
+        backgroundColor: Colors.indigo
+    }
+})
 
 export const ShopNavigator = () => {
+    const { cart } = useSelector(state => state.user);
     return (
         <Navigator screenOptions={NavBarConfig}>
+            <Screen
+                component={AutoLogin}
+                name="AutoLogin"
+                options={{
+                    headerShown: false,
+                }}
+            />
             <Screen
                 name="Home"
                 component={Home}
                 options={({ navigation }) => ({
+                    // headerShown: false,
                     headerLeft: (props) => {
                         return (
                             <Appbar.Action
@@ -49,12 +49,16 @@ export const ShopNavigator = () => {
                         );
                     },
                     headerRight: (props) => (
+                        <>
                         <Appbar.Action
                             {...props}
                             color={props.tintColor}
-                            icon="cart"
+                                icon="cart"
+                                style={styles.cartIcon}
                             onPress={() => navigation.navigate("Cart")}
-                        />
+                            />
+                             <Badge style={styles.badge} visible={cart.length > 0} size={15}>{cart.length }</Badge>
+                         </>
                     ),
                     headerTintColor: Colors.black,
                 })}

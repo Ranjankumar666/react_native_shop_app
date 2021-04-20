@@ -8,25 +8,37 @@ import {
 } from "react-native-paper";
 import { NavigationContainer } from "@react-navigation/native";
 import { Provider } from "react-redux";
-import { createStore, combineReducers } from "redux";
+import { createStore, combineReducers, applyMiddleware } from "redux";
 import { DrawerNavigator } from "./navigation/RootDrawer";
 import productReducer from "./store/reducers/product";
 import userReducer from "./store/reducers/user";
+import authReducer from "./store/reducers/auth";
 import * as Font from "expo-font";
 import AppLoading from "expo-app-loading";
 import { fontConfig } from "./Constants/fontConfig";
+import { enableScreens } from "react-native-screens";
+import Colors from "./Constants/Colors";
+import thunk from "redux-thunk";
+
+enableScreens();
 
 const reducers = combineReducers({
     products: productReducer,
     user: userReducer,
+    auth: authReducer,
 });
 
 const theme = {
     ...DefaultTheme,
+    colors: {
+        ...DefaultTheme.colors,
+        primary: Colors.indigo,
+        text: Colors.black,
+    },
     fonts: configureFonts(fontConfig),
 };
 
-const store = createStore(reducers);
+const store = createStore(reducers, applyMiddleware(thunk));
 
 export default function App() {
     const [fontsLoaded, setFontsLoaded] = useState(false);

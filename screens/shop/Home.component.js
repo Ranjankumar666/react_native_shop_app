@@ -1,17 +1,37 @@
-import { useNavigation } from "@react-navigation/core";
-import React from "react";
+import { useNavigation } from "@react-navigation/native";
+import React, { useCallback, useEffect, useState } from "react";
 import { FlatList, TouchableOpacity, View } from "react-native";
-import { Card, IconButton, Snackbar, Text, Title } from "react-native-paper";
+import {
+    Card,
+    IconButton,
+    Snackbar,
+    Text,
+    ActivityIndicator,
+    Title,
+} from "react-native-paper";
 import { useDispatch, useSelector } from "react-redux";
 import Colors from "../../Constants/Colors";
+import { getAllProducts } from "../../store/actions/product";
 import { addToCart, removeFromCart } from "../../store/actions/user";
+
+export const Message = (props) => (
+    <View
+        style={{
+            flex: 1,
+            alignItems: "center",
+            justifyContent: "center",
+        }}
+    >
+        {props.children}
+    </View>
+);
 
 export const CardItem = (props) => {
     const navigation = useNavigation();
     const dispatch = useDispatch();
     const { cart } = useSelector((state) => state.user);
 
-    const isPresentInCart = () => cart.find((item) => item === props.id);
+    const isPresentInCart = () => cart.find((item) => item.id === props.id);
     let cartIcon = isPresentInCart() ? "cart" : "cart-outline";
 
     return (
@@ -48,7 +68,13 @@ export const CardItem = (props) => {
                                 return;
                             }
 
-                            dispatch(addToCart(props.id));
+                            dispatch(
+                                addToCart({
+                                    id: props.id,
+                                    title: props.title,
+                                    price: props.price,
+                                })
+                            );
                         }}
                     />
                 </Card.Actions>
@@ -61,12 +87,78 @@ export const Home = (props) => {
     const { availableProducts } = useSelector((state) => state.products);
     const dispatch = useDispatch();
     const { showSnackbar, message } = useSelector((state) => state.user);
+    const [isLoading, setIsLoading] = useState(false);
+    const [isRefreshing, setIsRefreshing] = useState(false);
+    const [error, setError] = useState(false);
 
-    // const isPresentInCart = () => cart.find((item) => item === props.id);
-    // console.log(availableProducts);
+    const fetchData = useCallback(async () => {
+        try {
+            setError(false);
+            setIsRefreshing(true);
+            await dispatch(getAllProducts());
+            setIsRefreshing(false);
+        } catch (err) {
+            console.log("HOME COMPONENE",err);
+            setIsRefreshing(false);
+            setError({
+                message: "Something went wrong",
+            });
+        }
+    }, [dispatch, setError, setIsLoading]);
+
+    /**Another UseEffect for reloading products when chaning drawers */
+    const { navigation } = props;
+    useEffect(() => {
+        const sub = navigation.addListener("focus", fetchData);
+
+        return sub;
+    }, [fetchData]);
+
+    useEffect(() => {
+        setIsLoading(true);
+        fetchData()
+            .then(() => setIsLoading(false))
+            .catch((err) => {
+                setIsLoading(false);
+                setError({
+                    message: "Something went wrong",
+                });
+            });
+    }, []);
+
+    if (isLoading) {
+        return (
+            <Message>
+                <ActivityIndicator
+                    animating={true}
+                    color={Colors.indigo}
+                    size="large"
+                />
+            </Message>
+        );
+    }
+
+    if (error) {
+        return (
+            <Message>
+                <Title>{error.message}</Title>
+                <IconButton icon="reload" size={24} onPress={fetchData} />
+            </Message>
+        );
+    }
+
+    if (!isLoading && (!availableProducts || availableProducts.length <= 0)) {
+        return (
+            <Message>
+                <Title>No Items yet</Title>
+            </Message>
+        );
+    }
     return (
         <View style={{ flex: 1, padding: 5 }}>
             <FlatList
+                refreshing={isLoading}
+                onRefresh={fetchData}
                 data={availableProducts}
                 numColumns={2}
                 renderItem={({ item }) => (

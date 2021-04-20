@@ -7,4 +7,17 @@ export default class Product {
         this.description = description;
         this.price = price;
     }
+
+    updateTitle(title) {
+        this.title = title;
+    }
+    updateImageUrl(title) {
+        this.title = title;
+    }
+    updateImageUrl(url) {
+        this.imageUrl = url;
+    }
+    updateDescription(description) {
+        this.description = description;
+    }
 }
