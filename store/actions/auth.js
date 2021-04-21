@@ -5,7 +5,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 let timer;
 
 export const authenticate = (token, userId, refreshToken) => {
-    clearTimer()
+    clearTimer();
     return {
         type: "AUTHENTICATE",
         payload: {
@@ -76,7 +76,6 @@ export const signIn = (email, password) => async (dispatch) => {
     await storeData(data.idToken, data.localId, expDate, data.refreshToken);
 };
 
-
 export const getUserData = () => async (dispatch, getState) => {
     const { token } = getState().auth;
 
@@ -114,14 +113,14 @@ export const signout = () => async (dispatch) => {
 
 const clearTimer = () => {
     if (timer) {
-        clearTimeout(timer)
+        clearTimeout(timer);
     }
 };
 
 export const autoGetToken = (expiryTime, refreshToken) => (dispatch) => {
     timer = setTimeout(() => {
         dispatch(getTokenfromRefreshToken(refreshToken));
-    }, expiryTime);
+    }, expiryTime - 1000);
 };
 
 export const getTokenfromRefreshToken = (refreshToken) => async (dispatch) => {
@@ -164,6 +163,6 @@ const storeData = async (token, userId, expiresIn, refreshToken) => {
             })
         );
     } catch (err) {
-        console.log("ASYNC STORE DATA ERROR",err.message);
+        console.log("ASYNC STORE DATA ERROR", err.message);
     }
 };

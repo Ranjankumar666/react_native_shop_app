@@ -13,17 +13,18 @@ import { StyleSheet } from "react-native";
 const { Navigator, Screen } = createStackNavigator();
 
 const styles = StyleSheet.create({
-    cartIcon: {position: "relative"},
+    cartIcon: { position: "relative" },
     badge: {
         position: "absolute",
-        top: 10,
+        textAlign: "center",
+        top: 8,
         right: 6,
-        backgroundColor: Colors.indigo
-    }
-})
+        backgroundColor: Colors.indigo,
+    },
+});
 
 export const ShopNavigator = () => {
-    const { cart } = useSelector(state => state.user);
+    const { cart } = useSelector((state) => state.user);
     return (
         <Navigator screenOptions={NavBarConfig}>
             <Screen
@@ -50,15 +51,20 @@ export const ShopNavigator = () => {
                     },
                     headerRight: (props) => (
                         <>
-                        <Appbar.Action
-                            {...props}
-                            color={props.tintColor}
+                            <Appbar.Action
+                                {...props}
+                                color={props.tintColor}
                                 icon="cart"
                                 style={styles.cartIcon}
-                            onPress={() => navigation.navigate("Cart")}
+                                onPress={() => navigation.navigate("Cart")}
                             />
-                             <Badge style={styles.badge} visible={cart.length > 0} size={15}>{cart.length }</Badge>
-                         </>
+                            <Badge
+                                children={cart.length}
+                                style={styles.badge}
+                                visible={cart.length > 0}
+                                size={16}
+                            />
+                        </>
                     ),
                     headerTintColor: Colors.black,
                 })}

@@ -3,7 +3,7 @@ import { baseUrl } from "../../Constants/dbURL";
 export const addToCart = (id) => async (dispatch, getState) => {
     const { token, userId } = getState().auth;
 
-    console.log(id)
+    console.log(id);
     /** ADD THE cart in database */
     // const response = await fetch(`${baseUrl}cart/${userId}.json?auth=${token}`, {
     //     method: "POST",
@@ -19,18 +19,18 @@ export const addToCart = (id) => async (dispatch, getState) => {
     // }
     // const data = await response.json();
     // console.log(data);
-    
+
     dispatch({ type: "ADDTOCART", newItem: id });
 };
 
-export const removeFromCart = (id) => dispatch => {
+export const removeFromCart = (id) => (dispatch) => {
     console.log(id);
     /**REmove from db */
     // const response = await fetch(`${baseUrl}cart/${userId}.json?auth=${token}`, {
     //     method: "DELETE",
     // });
     dispatch({ type: "REMOVEFROMCART", itemId: id });
-} 
+};
 
 export const getOrders = () => async (dispatch, getState) => {
     const { token, userId } = getState().auth;
@@ -58,6 +58,25 @@ export const getOrders = () => async (dispatch, getState) => {
     });
 };
 
+export const getCart = () => async (dispatch, getState) => {
+    const { userId, token } = getState().auth;
+    
+    const response = await fetch(`${baseUrl}cart/${userId}.json?auth=${token}`);
+
+    if (!response.ok) {
+        throw new Error('Something went wrong');
+    }
+
+    const data = await response.json();
+
+    console.log(data);
+
+    dispatch({
+        type: "GETCART",
+        cart: data
+    })
+};
+
 export const orderCart = (items) => async (dispatch, getState) => {
     const { token, userId } = getState().auth;
 
@@ -67,17 +86,20 @@ export const orderCart = (items) => async (dispatch, getState) => {
 
     const date = new Date().toISOString();
 
-    const response = await fetch(`${baseUrl}orders/${userId}.json?auth=${token}`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-            items,
-            amount,
-            created_at: date,
-        }),
-    });
+    const response = await fetch(
+        `${baseUrl}orders/${userId}.json?auth=${token}`,
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                items,
+                amount,
+                created_at: date,
+            }),
+        }
+    );
 
     if (!response.ok) {
         throw new Error("Something went wrong");

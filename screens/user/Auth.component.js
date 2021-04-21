@@ -92,7 +92,7 @@ export const AuthScreen = (props) => {
             );
             props.navigation.navigate("Home");
         } catch (err) {
-            console.log("AUTH COMPONENTE",err);
+            console.log("AUTH COMPONENTE", err);
             setIsLoading(false);
             setError({ message: "Something went wrong" });
         }

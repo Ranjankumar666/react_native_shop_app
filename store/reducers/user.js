@@ -12,7 +12,7 @@ export default (state = initState, action) => {
     switch (action.type) {
         case "ADDTOCART":
             const oldState = [...state.cart];
-            if (!oldState.find((item) => item.id === action.newItem)) {
+            if (!oldState.find((item) => item.id === action.newItem.id)) {
                 oldState.push(
                     new CartItem(
                         action.newItem.id,
@@ -95,6 +95,11 @@ export default (state = initState, action) => {
                 ...state,
                 orders: action.orders,
             };
+        // case "GETCART":
+        //     return {
+        //         ...state,
+        //         cart: action.cart,
+        //     };
 
         default:
             return state;
