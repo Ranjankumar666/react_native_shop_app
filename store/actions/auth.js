@@ -1,4 +1,4 @@
-const api_key = "AIzaSyCOow5uHpvpsSj-ItD2KvttvQfYQom0sf8";
+const api_key = process.env.FIREBASE_API_KEY;
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
