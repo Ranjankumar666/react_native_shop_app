@@ -39,7 +39,8 @@ export default (state = initState, action) => {
                         item.title,
                         item.imageUrl,
                         item.description,
-                        Number(item.price)
+                        Number(item.price),
+                        action.userPushToken
                     ),
                 ],
             };

@@ -18,7 +18,8 @@ export default (state = initState, action) => {
                         action.newItem.id,
                         1,
                         action.newItem.price,
-                        action.newItem.title
+                        action.newItem.title,
+                        action.newItem.userPushToken
                     )
                 );
             }

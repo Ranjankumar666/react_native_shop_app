@@ -1,6 +1,6 @@
 import { StatusBar } from "expo-status-bar";
 import React, { useEffect, useState } from "react";
-import { Platform, StyleSheet, Text, View } from "react-native";
+import { Platform } from "react-native";
 import {
     Provider as PaperProvider,
     DefaultTheme,
@@ -19,6 +19,18 @@ import { fontConfig } from "./Constants/fontConfig";
 import { enableScreens } from "react-native-screens";
 import Colors from "./Constants/Colors";
 import thunk from "redux-thunk";
+import { LogBox } from "react-native";
+import * as Notifications from "expo-notifications";
+
+Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+        shouldShowAlert: true,
+        shouldPlaySound: false,
+        shouldSetBadge: false,
+    }),
+});
+
+LogBox.ignoreLogs(["Setting a timer"]);
 
 enableScreens();
 
@@ -75,12 +87,3 @@ export default function App() {
         </Provider>
     );
 }
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: "#fff",
-        // alignItems: "center",
-        // justifyContent: "center",
-    },
-});

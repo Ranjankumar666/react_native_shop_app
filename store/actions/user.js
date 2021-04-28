@@ -1,5 +1,24 @@
 import { baseUrl } from "../../Constants/dbURL";
 
+const notifyOwner = async (items) => {
+    for (let item of items) {
+        fetch("https://exp.host/--/api/v2/push/send", {
+            method: "POST",
+            headers: {
+                Accept: "application/json",
+                "Accept-Encoding": "gzip, deflate",
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                to: item.userPushToken,
+                title: "New order",
+                body: `Your product "${item.productTitle}" has been ordered`,
+                data: item,
+            }),
+        });
+    }
+};
+
 export const addToCart = (id) => async (dispatch, getState) => {
     const { token, userId } = getState().auth;
 
@@ -24,7 +43,6 @@ export const addToCart = (id) => async (dispatch, getState) => {
 };
 
 export const removeFromCart = (id) => (dispatch) => {
-    console.log(id);
     /**REmove from db */
     // const response = await fetch(`${baseUrl}cart/${userId}.json?auth=${token}`, {
     //     method: "DELETE",
@@ -60,21 +78,19 @@ export const getOrders = () => async (dispatch, getState) => {
 
 export const getCart = () => async (dispatch, getState) => {
     const { userId, token } = getState().auth;
-    
+
     const response = await fetch(`${baseUrl}cart/${userId}.json?auth=${token}`);
 
     if (!response.ok) {
-        throw new Error('Something went wrong');
+        throw new Error("Something went wrong");
     }
 
     const data = await response.json();
 
-    console.log(data);
-
     dispatch({
         type: "GETCART",
-        cart: data
-    })
+        cart: data,
+    });
 };
 
 export const orderCart = (items) => async (dispatch, getState) => {
@@ -100,7 +116,7 @@ export const orderCart = (items) => async (dispatch, getState) => {
             }),
         }
     );
-
+    notifyOwner(items);
     if (!response.ok) {
         throw new Error("Something went wrong");
     }

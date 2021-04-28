@@ -7,7 +7,7 @@ import {
     List,
     Subheading,
     Title,
-    Card
+    Card,
 } from "react-native-paper";
 import { useDispatch, useSelector } from "react-redux";
 import Colors from "../../Constants/Colors";

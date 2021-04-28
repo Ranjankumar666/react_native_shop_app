@@ -1,24 +1,52 @@
-import React, { useEffect, useReducer, useState } from "react";
+import React, { useEffect, useReducer, useState, useCallback } from "react";
 import {
     ActivityIndicator,
     Alert,
     KeyboardAvoidingView,
+    ScrollView,
     StyleSheet,
     View,
 } from "react-native";
 import {
     Button,
+    Card,
     HelperText,
-    IconButton,
+    Paragraph,
     TextInput,
-    Title,
 } from "react-native-paper";
 import { useSelector, useDispatch } from "react-redux";
 import Colors from "../../Constants/Colors";
 import { createProduct, updateProduct } from "../../store/actions/product";
 import { Message } from "../shop/Home.component";
+import * as ImagePicker from "expo-image-picker";
+
+const basicConfig = {
+    allowsEditing: true,
+    aspect: [1, 1],
+    quality: 0.1,
+};
 
 const formReducer = (state, action) => {
+    if (action.type === "UPDATE_URL") {
+        const updatedValues = {
+            ...state.inputValues,
+            imageUrl: action.value,
+        };
+
+        const updatedValidities = {
+            ...state.inputValid,
+            imageUrl: true,
+        };
+
+        return {
+            inputValues: updatedValues,
+            inputValid: updatedValidities,
+            formIsValid: Object.values(updatedValidities).every(
+                (e) => e === true
+            ),
+        };
+    }
+
     if (action.type === "UPDATE") {
         const updatedValues = {
             ...state.inputValues,
@@ -30,7 +58,6 @@ const formReducer = (state, action) => {
             [action.input]: action.isValid,
         };
         return {
-            ...state,
             inputValues: updatedValues,
             inputValid: updatedValidities,
             formIsValid: Object.values(updatedValidities).every(
@@ -60,6 +87,7 @@ export const EditProduct = ({ navigation, route }) => {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(false);
     const dispatch = useDispatch();
+    const [image, setImage] = useState(null);
 
     /**Get the specifivc item first for default inputs */
     let editProduct;
@@ -94,18 +122,37 @@ export const EditProduct = ({ navigation, route }) => {
         });
     };
 
+    const takeImageAsync = async () => {
+        const result = await ImagePicker.launchCameraAsync(basicConfig);
+
+        if (!result.cancelled) {
+            // setImage(result.uri);
+            setImage(result.uri);
+            textChangeHandler("imageUrl", result.uri);
+        }
+    };
+    const pickImageAsync = async () => {
+        const result = await ImagePicker.launchImageLibraryAsync(basicConfig);
+        if (!result.cancelled) {
+            setImage(result.uri);
+            textChangeHandler("imageUrl", result.uri);
+        }
+    };
+
     /**Data  Handlers And Setters */
     const updateData = async () => {
-        const { formIsValid } = state;
+        setIsLoading(true);
 
-        if (!formIsValid) {
+        if (!state.formIsValid) {
             Alert.alert("Invalid credentials", "Check yout inputs", [
                 {
                     text: "Dismiss",
                 },
             ]);
+            setIsLoading(false);
             return;
         }
+
         const { inputValues } = state;
 
         try {
@@ -113,7 +160,7 @@ export const EditProduct = ({ navigation, route }) => {
             await dispatch(updateProduct(id, inputValues));
             navigation.navigate("Your Products");
         } catch (err) {
-            console.log("UPDATE ITEM",err.message);
+            console.log("UPDATE ITEM", err.message);
             setIsLoading(false);
             setError({
                 message: "Something went wrong",
@@ -122,7 +169,7 @@ export const EditProduct = ({ navigation, route }) => {
     };
 
     const createItem = async () => {
-        const { formIsValid } = state;
+        setIsLoading(true);
 
         if (!state.formIsValid) {
             Alert.alert("Invalid credentials", "Check yout inputs", [
@@ -130,13 +177,14 @@ export const EditProduct = ({ navigation, route }) => {
                     text: "Dismiss",
                 },
             ]);
+            setIsLoading(false);
             return;
         }
         const { title, price, description, imageUrl } = state.inputValues;
 
         try {
             setIsLoading(true);
-            await dispatch(
+            dispatch(
                 createProduct({
                     title,
                     description,
@@ -146,15 +194,11 @@ export const EditProduct = ({ navigation, route }) => {
             );
             navigation.navigate("Your Products");
         } catch (err) {
-            console.log("CREATE ITEM ERROR",err.message);
+            console.log("CREATE ITEM ERROR", err.message);
             setIsLoading(false);
             setError({ message: "Something Went Wrong" });
         }
     };
-
-    if (isLoading) {
-        return <FormSubmissionIndicator />;
-    }
 
     if (error)
         Alert.alert("Error", error.message, [
@@ -162,104 +206,155 @@ export const EditProduct = ({ navigation, route }) => {
                 type: "Dismiss",
             },
         ]);
-    // useEffect(() => {
-
-    // }, [error]);
 
     /** Component */
     return (
-        <KeyboardAvoidingView
-            behavior="padding"
-            keyboardVerticalOffset={100}
-            style={{ flex: 1 }}
-        >
-            {/* <Provider> */}
-            <View style={{ padding: 5 }}>
-                <View>
-                    <TextInput
-                        label="Title"
-                        value={state.inputValues.title}
-                        onChangeText={(text) =>
-                            textChangeHandler("title", text)
-                        }
-                        style={styles.input}
-                        autoCapitalize="sentences"
-                        autoCorrect
-                        autoCorrect
-                        autoFocus
-                        returnKeyType="next"
-                    />
-                    <HelperText type="error" visible={!state.inputValid.title}>
-                        Title can't be invalid
-                    </HelperText>
-                </View>
+        <ScrollView style={{ flex: 1 }}>
+            <KeyboardAvoidingView
+                behavior="padding"
+                keyboardVerticalOffset={100}
+                style={{ flex: 1 }}
+            >
+                {/* <Provider> */}
+                <View style={{ flex: 1, padding: 5 }}>
+                    <View>
+                        <TextInput
+                            label="Title"
+                            value={state.inputValues.title}
+                            onChangeText={(text) =>
+                                textChangeHandler("title", text)
+                            }
+                            style={styles.input}
+                            autoCapitalize="sentences"
+                            autoCorrect
+                            autoCorrect
+                            autoFocus
+                            returnKeyType="next"
+                        />
+                        <HelperText
+                            type="error"
+                            visible={!state.inputValid.title}
+                        >
+                            Title can't be invalid
+                        </HelperText>
+                    </View>
 
-                <View>
-                    <TextInput
-                        label="Description"
-                        value={state.inputValues.description}
-                        multiline={true}
-                        numberOfLines={4}
-                        onChangeText={(text) =>
-                            textChangeHandler("description", text)
-                        }
-                        style={styles.input}
-                        returnKeyType="next"
-                    />
-                    <HelperText
-                        type="error"
-                        visible={!state.inputValid.description}
+                    <View>
+                        <TextInput
+                            label="Description"
+                            value={state.inputValues.description}
+                            multiline={true}
+                            numberOfLines={4}
+                            onChangeText={(text) =>
+                                textChangeHandler("description", text)
+                            }
+                            style={styles.input}
+                            returnKeyType="next"
+                        />
+                        <HelperText
+                            type="error"
+                            visible={!state.inputValid.description}
+                        >
+                            Description can't be empty
+                        </HelperText>
+                    </View>
+
+                    <View>
+                        <TextInput
+                            keyboardType="decimal-pad"
+                            label="Price"
+                            value={String(state.inputValues.price)}
+                            onChangeText={(text) =>
+                                textChangeHandler("price", text)
+                            }
+                            style={styles.input}
+                            returnKeyType="next"
+                            // selectionColor={Colors.indigo}
+                        />
+                        <HelperText
+                            type="error"
+                            visible={!state.inputValid.price}
+                        >
+                            Price can't be empty
+                        </HelperText>
+                    </View>
+
+                    <View>
+                        <TextInput
+                            label="Image Url"
+                            value={state.inputValues.imageUrl}
+                            onChangeText={(text) =>
+                                textChangeHandler("imageUrl", text)
+                            }
+                            style={styles.input}
+                            returnKeyType="next"
+                            onSubmitEditing={id ? updateData : createItem}
+                        />
+                        {image && (
+                            <Card.Cover
+                                source={{ uri: image }}
+                                style={{
+                                    marginBottom: 10,
+                                }}
+                            />
+                        )}
+                        {!image && (
+                            <Paragraph
+                                style={{ textAlign: "center", marginBottom: 5 }}
+                            >
+                                Or
+                            </Paragraph>
+                        )}
+                        <View
+                            style={{
+                                justifyContent: "space-evenly",
+                                flexDirection: "row",
+                                marginBottom: 10,
+                            }}
+                        >
+                            <Button
+                                icon="image-plus"
+                                mode="contained"
+                                onPress={async () => await pickImageAsync()}
+                                style={{
+                                    flexBasis: "49%",
+                                }}
+                            >
+                                Pick an Image
+                            </Button>
+                            <Button
+                                icon="camera-plus"
+                                mode="contained"
+                                onPress={async () => await takeImageAsync()}
+                                style={{
+                                    flexBasis: "49%",
+                                }}
+                            >
+                                Take a Picture
+                            </Button>
+                        </View>
+                        <HelperText
+                            type="error"
+                            visible={!state.inputValid.imageUrl || !image}
+                        >
+                            Image url can't be invalid
+                        </HelperText>
+                    </View>
+
+                    <Button
+                        mode="contained"
+                        disabled={isLoading}
+                        loading={isLoading}
+                        style={{ backgroundColor: Colors.indigo }}
+                        onPress={id ? updateData : createItem}
                     >
-                        Description can't be empty
-                    </HelperText>
+                        {id ? "Update" : "Create"}
+                    </Button>
                 </View>
 
-                <View>
-                    <TextInput
-                        keyboardType="decimal-pad"
-                        label="Price"
-                        value={String(state.inputValues.price)}
-                        onChangeText={(text) =>
-                            textChangeHandler("price", text)
-                        }
-                        style={styles.input}
-                        returnKeyType="next"
-                        // selectionColor={Colors.indigo}
-                    />
-                    <HelperText type="error" visible={!state.inputValid.price}>
-                        Price can't be empty
-                    </HelperText>
-                </View>
-
-                <View>
-                    <TextInput
-                        label="Image Url"
-                        value={state.inputValues.imageUrl}
-                        onChangeText={(text) =>
-                            textChangeHandler("imageUrl", text)
-                        }
-                        style={styles.input}
-                        returnKeyType="next"
-                        onSubmitEditing={id ? updateData : createItem}
-                    />
-                    <HelperText
-                        type="error"
-                        visible={!state.inputValid.imageUrl}
-                    >
-                        imageUrl can't be invalid
-                    </HelperText>
-                </View>
-
-                <Button
-                    mode="contained"
-                    style={{ backgroundColor: Colors.indigo }}
-                    onPress={id ? updateData : createItem}
-                >
-                    {id ? "Update" : "Create"}
-                </Button>
-            </View>
-            {/* </Provider> */}
-        </KeyboardAvoidingView>
+                {/* </Provider> */}
+            </KeyboardAvoidingView>
+        </ScrollView>
     );
 };
 

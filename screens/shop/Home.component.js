@@ -73,6 +73,7 @@ export const CardItem = (props) => {
                                     id: props.id,
                                     title: props.title,
                                     price: props.price,
+                                    userPushToken: props.userPushToken,
                                 })
                             );
                         }}
@@ -98,7 +99,7 @@ export const Home = (props) => {
             await dispatch(getAllProducts());
             setIsRefreshing(false);
         } catch (err) {
-            console.log("HOME COMPONENE",err);
+            console.log("HOME COMPONENT", err);
             setIsRefreshing(false);
             setError({
                 message: "Something went wrong",
@@ -167,6 +168,7 @@ export const Home = (props) => {
                         title={item.title}
                         imageUrl={item.imageUrl}
                         price={item.price}
+                        userPushToken={item.userPushToken}
                     />
                 )}
                 columnWrapperStyle={{ justifyContent: "space-between" }}

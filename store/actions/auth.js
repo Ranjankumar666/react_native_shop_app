@@ -106,6 +106,7 @@ export const getUserData = () => async (dispatch, getState) => {
 
 export const signout = () => async (dispatch) => {
     await AsyncStorage.removeItem("userData");
+    clearTimer();
     dispatch({
         type: "LOGOUT",
     });
@@ -120,7 +121,7 @@ const clearTimer = () => {
 export const autoGetToken = (expiryTime, refreshToken) => (dispatch) => {
     timer = setTimeout(() => {
         dispatch(getTokenfromRefreshToken(refreshToken));
-    }, expiryTime - 1000);
+    }, expiryTime);
 };
 
 export const getTokenfromRefreshToken = (refreshToken) => async (dispatch) => {
