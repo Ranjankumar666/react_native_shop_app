@@ -8,7 +8,7 @@ import {
 } from 'react-native-paper';
 import { NavigationContainer } from '@react-navigation/native';
 import { Provider } from 'react-redux';
-import { DrawerNavigator } from './navigation/RootDrawer';
+import { DrawerNavigator } from './navigation/DrawerNavigator';
 import * as Font from 'expo-font';
 import AppLoading from 'expo-app-loading';
 import { fontConfig } from './Constants/fontConfig';

@@ -1,4 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
+import CartItem from '../../models/cartItem';
 
 const initState = {
 	cart: [],
@@ -13,7 +14,7 @@ export const userSlice = createSlice({
 	initialState: initState,
 	reducers: {
 		addToCart(state, action) {
-			const { newItem } = action.payload;
+			const newItem = action.payload;
 
 			const doesExist = state.cart.find((item) => item.id === newItem.id);
 
@@ -26,7 +27,7 @@ export const userSlice = createSlice({
 				newItem.title,
 				newItem.userPushToken
 			);
-			state.cart.push(item);
+			state.cart.push(item.toObject());
 		},
 		showSnackbar(state) {
 			state.showSnackbar = true;
@@ -38,7 +39,9 @@ export const userSlice = createSlice({
 		removeFromCart(state, action) {
 			state.message = 'Item removed from cart';
 			state.showSnackbar = true;
-			state.cart = state.cart.filter((item) => item.id != action.payload);
+			state.cart = state.cart.filter(
+				(item) => item.id !== action.payload
+			);
 		},
 		order(state, action) {
 			const { id, items, amount, created_at } = action.payload;
@@ -51,11 +54,11 @@ export const userSlice = createSlice({
 
 			state.orders.push(createOrder);
 		},
-		addQuantity() {
+		addQuantity(state, action) {
 			const cart = [...state.cart];
 			const item = cart.find((item) => item.id === action.payload);
 
-			item.increQunatity();
+			item.quantity += 1;
 
 			state.cart = cart;
 		},
@@ -63,7 +66,7 @@ export const userSlice = createSlice({
 			const cart = [...state.cart];
 			const item = cart.find((item) => item.id === action.payload);
 
-			item.decreQunatity();
+			item.quantity -= 1;
 
 			state.cart = cart;
 		},

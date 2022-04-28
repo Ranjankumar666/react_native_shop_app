@@ -25,7 +25,7 @@ export const authSlice = createSlice({
 			state.refreshToken = null;
 		},
 		userData(state, action) {
-			state.email = action.email;
+			state.email = action.payload;
 		},
 	},
 });

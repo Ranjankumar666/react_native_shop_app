@@ -1,5 +1,4 @@
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { FlatList, View } from 'react-native';
 import {
 	Button,
@@ -10,13 +9,8 @@ import {
 	Card,
 } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux';
-import {
-	removeFromCart,
-	orderCart,
-	updateCartItem,
-	addQuantity,
-	subQuantity,
-} from '../../store/actions/user';
+
+import { orderCart } from '../../store/actions/user';
 import { userSlice } from '../../store/slices/user';
 
 export const CartItem = (props) => {
@@ -56,7 +50,7 @@ export const CartItem = (props) => {
 						{...props}
 						icon="delete"
 						onPress={() => {
-							dispatch(removeFromCart(itemId));
+							dispatch(userSlice.actions.removeFromCart(itemId));
 						}}
 					/>
 				</View>
@@ -65,7 +59,7 @@ export const CartItem = (props) => {
 	);
 };
 
-export const Cart = ({ navigation, route }) => {
+export const Cart = ({ navigation }) => {
 	const { cart } = useSelector((state) => state.user);
 	const { token } = useSelector((state) => state.auth);
 

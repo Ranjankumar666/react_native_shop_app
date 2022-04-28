@@ -1,6 +1,6 @@
+import { createSlice } from '@reduxjs/toolkit';
 import Product from '../../models/product';
 
-import { createSlice } from '@reduxjs/toolkit';
 const initState = {
 	availableProducts: [],
 	userProducts: [],
@@ -14,7 +14,7 @@ export const productSlice = createSlice({
 			state.availableProducts = action.payload.products;
 		},
 		getUserProducts(state, action) {
-			state.userProducts = action.payload.userProducts;
+			state.userProducts = action.payload.products;
 		},
 		delete(state, action) {
 			state.availableProducts = state.availableProducts.filter(

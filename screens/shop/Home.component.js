@@ -12,7 +12,6 @@ import {
 import { useDispatch, useSelector } from 'react-redux';
 import Colors from '../../Constants/Colors';
 import { getAllProducts } from '../../store/actions/product';
-import { addToCart, removeFromCart } from '../../store/actions/user';
 import { userSlice } from '../../store/slices/user';
 
 export const Message = (props) => (
@@ -65,19 +64,19 @@ export const CardItem = (props) => {
 						size={25}
 						onPress={() => {
 							if (isPresentInCart()) {
-								dispatch(removeFromCart(props.id));
+								dispatch(
+									userSlice.actions.removeFromCart(props.id)
+								);
 								return;
 							}
 
 							dispatch(
-								userSlice.actions.addToCart(
-									addToCart({
-										id: props.id,
-										title: props.title,
-										price: props.price,
-										userPushToken: props.userPushToken,
-									})
-								)
+								userSlice.actions.addToCart({
+									id: props.id,
+									title: props.title,
+									price: props.price,
+									userPushToken: props.userPushToken,
+								})
 							);
 						}}
 					/>
@@ -180,11 +179,7 @@ export const Home = (props) => {
 			<Snackbar
 				visible={showSnackbar}
 				duration={1000}
-				onDismiss={() =>
-					dispatch({
-						type: 'HIDESNACKBAR',
-					})
-				}
+				onDismiss={() => dispatch(userSlice.actions.hideSnackbar())}
 			>
 				{message}
 			</Snackbar>

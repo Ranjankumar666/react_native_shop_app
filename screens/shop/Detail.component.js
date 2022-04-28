@@ -62,7 +62,11 @@ export const Detail = ({ route, navigation }) => {
 						}}
 						onPress={() => {
 							if (isPresentInCart()) {
-								dispatch(removeFromCart(route.params.id));
+								dispatch(
+									userSlice.actions.removeFromCart(
+										route.params.id
+									)
+								);
 								return;
 							}
 							dispatch(userSlice.actions.addToCart(product));

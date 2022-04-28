@@ -1,18 +1,18 @@
 import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 import { Appbar } from 'react-native-paper';
-import { UserProduct } from '../screens/user/Products.component';
-import { EditProduct } from '../screens/user/Edit.component';
-import { NavConfig as NavBarConfig } from '../Constants/NavConfig';
+import { NavConfig } from '../Constants/NavConfig';
+import { AuthScreen } from '../screens/user/Auth.component';
 
 const { Navigator, Screen } = createStackNavigator();
 
-export const UserNavigator = () => {
+export const AuthNavigator = () => {
 	return (
-		<Navigator screenOptions={NavBarConfig}>
+		<Navigator screenOptions={NavConfig}>
 			<Screen
-				name="Your Products"
-				component={UserProduct}
+				name="Log In"
+				component={AuthScreen}
+				initialParams={{ type: 'signin' }}
 				options={({ navigation }) => ({
 					headerLeft: (props) => {
 						return (
@@ -27,13 +27,9 @@ export const UserNavigator = () => {
 				})}
 			/>
 			<Screen
-				name="Edit Product"
-				component={EditProduct}
-				options={({ _, route }) => {
-					return {
-						headerTitle: route.params.title && route.params.title,
-					};
-				}}
+				name="Sign Up"
+				component={AuthScreen}
+				initialParams={{ type: 'signup' }}
 			/>
 		</Navigator>
 	);

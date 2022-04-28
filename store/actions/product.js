@@ -73,7 +73,7 @@ export const getUserProducts = () => async (dispatch, getState) => {
 
 	dispatch(
 		productSlice.actions.getUserProducts({
-			getUserProducts: refineDataToArray(data),
+			products: refineDataToArray(data),
 		})
 	);
 };
@@ -125,7 +125,13 @@ export const createProduct = (item) => async (dispatch, getState) => {
 	});
 	const { name } = await res.json();
 
-	dispatch(productSlice.actions.create({ item, id: name, userPushToken }));
+	dispatch(
+		productSlice.actions.create({
+			item,
+			id: name,
+			userPushToken: pushToken,
+		})
+	);
 };
 
 export const deleteProduct = (id) => async (dispatch, getState) => {
