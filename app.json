@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "shop_app",
+    "name": "Shopapp",
     "slug": "shop_app",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -24,7 +24,8 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
       },
-      "package": "com.zpranjan2000.shop_app"
+      "package": "com.zpranjan2000.shop_app",
+      "versionCode": 3
     },
     "web": {
       "favicon": "./assets/favicon.png"

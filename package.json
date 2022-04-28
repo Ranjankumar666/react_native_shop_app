@@ -37,7 +37,11 @@
 		"react-redux": "^7.2.3"
 	},
 	"devDependencies": {
-		"@babel/core": "^7.9.0"
+		"@babel/core": "^7.9.0",
+		"@babel/eslint-parser": "^7.17.0",
+		"eslint": "^8.14.0",
+		"eslint-plugin-react": "^7.29.4",
+		"eslint-plugin-react-native": "^4.0.0"
 	},
 	"private": true
 }

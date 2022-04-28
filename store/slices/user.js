@@ -59,6 +59,7 @@ export const userSlice = createSlice({
 			const item = cart.find((item) => item.id === action.payload);
 
 			item.quantity += 1;
+			item.sum = item.productPrice * item.quantity;
 
 			state.cart = cart;
 		},
@@ -67,6 +68,11 @@ export const userSlice = createSlice({
 			const item = cart.find((item) => item.id === action.payload);
 
 			item.quantity -= 1;
+
+			if (item.productPrice * item.quantity >= item.productPrice) {
+				item.sum = item.productPrice * item.quantity;
+				item.quantity -= 1;
+			}
 
 			state.cart = cart;
 		},

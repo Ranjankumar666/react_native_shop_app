@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { View } from 'react-native';
+import { ScrollView } from 'react-native';
 import { Title, List, ActivityIndicator } from 'react-native-paper';
 import Colors from '../../Constants/Colors';
 import { useDispatch, useSelector } from 'react-redux';
@@ -95,7 +95,7 @@ export const OrdersScreen = ({ navigation }) => {
 	}
 
 	return (
-		<View style={{ flex: 1, marginTop: 1 }}>
+		<ScrollView style={{ flex: 1, marginTop: 1 }}>
 			<List.AccordionGroup>
 				{orders.map((order) => (
 					<ListAccordion
@@ -107,6 +107,6 @@ export const OrdersScreen = ({ navigation }) => {
 					/>
 				))}
 			</List.AccordionGroup>
-		</View>
+		</ScrollView>
 	);
 };

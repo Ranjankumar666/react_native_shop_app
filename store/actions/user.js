@@ -20,28 +20,6 @@ const notifyOwner = async (items) => {
 	}
 };
 
-export const addToCart = (product) => async (dispatch, getState) => {
-	const { token, userId } = getState().auth;
-
-	/** ADD THE cart in database */
-	// const response = await fetch(`${baseUrl}cart/${userId}.json?auth=${token}`, {
-	//     method: "POST",
-	//     headers: {
-	//         'Content-Type': 'application/json'
-	//     },
-	//     body: JSON.stringify(id)
-
-	// });
-
-	// if (!response.ok) {
-	//     throw new Error("Something went wrong");
-	// }
-	// const data = await response.json();
-	// console.log(data);
-
-	dispatch(userSlice.actions.addToCart({ newItem: product }));
-};
-
 export const removeFromCart = (id) => (dispatch) => {
 	/**REmove from db */
 	// const response = await fetch(`${baseUrl}cart/${userId}.json?auth=${token}`, {
@@ -96,6 +74,8 @@ export const getCart = () => async (dispatch, getState) => {
 
 export const orderCart = (items) => async (dispatch, getState) => {
 	const { token, userId } = getState().auth;
+
+	items = items.map((i) => i.toObject());
 
 	const amount = parseFloat(
 		items.reduce((acc, ele) => (acc += ele.sum), 0)
