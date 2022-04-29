@@ -23,6 +23,7 @@ export const authSlice = createSlice({
 			state.userId = null;
 			state.token = null;
 			state.refreshToken = null;
+			state.email = null;
 		},
 		userData(state, action) {
 			state.email = action.payload;

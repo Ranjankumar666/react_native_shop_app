@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { ShopNavigator } from './ShopNavigator';
 import { DrawerContent } from '../components/CustomDrawer.component';

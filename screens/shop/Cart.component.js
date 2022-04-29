@@ -124,7 +124,7 @@ export const Cart = ({ navigation }) => {
 						mode="contained"
 						icon="login"
 						onPress={() => {
-							navigation.navigate('Log In');
+							navigation.navigate('Log In/Sign Up');
 						}}
 					>
 						Log in to order

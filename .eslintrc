@@ -19,8 +19,9 @@
 		],
 		"no-useless-escape": 0,
 		"react/prop-types": 0,
-		"react/jsx-no-bind": 2,
-		"react/jsx-no-duplicate-props": 2
+		"react/jsx-no-bind": 0,
+		"react/jsx-no-duplicate-props": 2,
+		"no-console": 2
 	},
 	"env": {
 		"react-native/react-native": true
